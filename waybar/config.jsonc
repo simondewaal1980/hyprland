@@ -28,6 +28,7 @@
     "cpu",
     "memory",
     "battery",
+    "custom/updates",
     "custom/wallpaper",
     "custom/power"
   ],
@@ -197,6 +198,15 @@
     ],
     "tooltip-format": "{timeTo}\n{power:.2f} W",
     "on-click": "~/.config/hypr/scripts/power-menu.sh"
+  },
+
+  "custom/updates": {
+    "exec": "~/.config/hypr/scripts/update-check.sh",
+    "return-type": "json",
+    "interval": 600,
+    "tooltip": true,
+    "on-click": "~/.config/hypr/scripts/update-check.sh --run",
+    "on-click-right": "~/.config/hypr/scripts/update-check.sh --check"
   },
 
   "custom/wallpaper": {

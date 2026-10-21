@@ -2,7 +2,8 @@
 #
 # update.sh — werk de Hyprland-desktopopzet bij.
 #
-# Naast de Ubuntu-pakketten zijn er drie bronnen buiten apt:
+# Naast de Ubuntu-pakketten zijn er vier bronnen buiten apt:
+#   * Flatpak          apps en runtimes uit de geconfigureerde remotes
 #   * pywal16          PyPI, geïnstalleerd met pipx
 #   * JetBrainsMono    GitHub-releases van ryanoasis/nerd-fonts
 #   * hyprlock         zelf gebouwd uit hyprwm/hyprlock
@@ -35,6 +36,7 @@ APT_FILE="${REPO_DIR}/packages/apt.txt"
 
 check_only=false
 do_apt=true
+do_flatpak=true
 do_config=true
 
 updates_available=0
@@ -48,6 +50,7 @@ Gebruik: $(basename "$0") [opties]
 Werkt de Hyprland-desktopopzet bij, inclusief software buiten de
 Ubuntu-repositories:
   * Ubuntu-pakketten uit packages/apt.txt
+  * Flatpak-apps en -runtimes
   * pywal16 (PyPI, via pipx)
   * JetBrainsMono Nerd Font (GitHub)
   * hyprlock (zelf gebouwd uit de GitHub-broncode)
@@ -56,6 +59,7 @@ Ubuntu-repositories:
 Opties:
   --check        alleen tonen wat verouderd is; wijzigt niets
   --no-apt       Ubuntu-pakketten overslaan
+  --no-flatpak   Flatpak-apps en -runtimes overslaan
   --no-config    configuraties niet opnieuw installeren
   -h, --help     deze uitleg tonen
 EOF
@@ -69,6 +73,7 @@ for opt in "$@"; do
     case "${opt}" in
         --check) check_only=true ;;
         --no-apt) do_apt=false ;;
+        --no-flatpak) do_flatpak=false ;;
         --no-config) do_config=false ;;
         -h|--help) usage; exit 0 ;;
         *)
@@ -180,6 +185,57 @@ update_apt() {
     else
         warn "Bijwerken van de Ubuntu-pakketten is mislukt."
         failures+=("apt")
+    fi
+}
+
+flatpak_update_list() {
+    # Toon wat er in beide installaties (systeem én gebruiker) verouderd is.
+    local installation output
+    local -a updates=()
+    for installation in system user; do
+        if [[ "${installation}" == "user" ]]; then
+            output="$(flatpak remote-ls --user --updates --columns=application 2>/dev/null)" || return 1
+        else
+            output="$(flatpak remote-ls --system --updates --columns=application 2>/dev/null)" || return 1
+        fi
+        [[ -z "${output}" ]] || updates+=("${output}")
+    done
+    if [[ ${#updates[@]} -gt 0 ]]; then
+        printf '%s\n' "${updates[@]}" | sort -u
+    fi
+}
+
+update_flatpak() {
+    if ! command -v flatpak >/dev/null 2>&1; then
+        say "Flatpak: niet geïnstalleerd; overgeslagen."
+        return
+    fi
+
+    local output
+    if ! output="$(flatpak_update_list)"; then
+        warn "Kon de Flatpak-updates niet ophalen; Flatpak overgeslagen."
+        return
+    fi
+
+    local -a updates=()
+    [[ -z "${output}" ]] || mapfile -t updates <<< "${output}"
+
+    if [[ ${#updates[@]} -eq 0 ]]; then
+        say "Flatpak: alles bij."
+        return
+    fi
+
+    updates_available=$((updates_available + ${#updates[@]}))
+
+    if ${check_only}; then
+        say "Flatpak: ${#updates[@]} update(s): ${updates[*]}"
+        return
+    fi
+
+    say "Flatpak bijwerken: ${updates[*]}"
+    if ! flatpak update -y; then
+        warn "Bijwerken van de Flatpak-apps en -runtimes is mislukt."
+        failures+=("Flatpak")
     fi
 }
 
@@ -368,6 +424,9 @@ fi
 
 if ${do_apt}; then
     update_apt
+fi
+if ${do_flatpak}; then
+    update_flatpak
 fi
 update_pywal
 update_font

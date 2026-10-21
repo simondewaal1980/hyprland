@@ -118,6 +118,9 @@ done
 chmod 755 "${CONFIG_DIR}/hypr/scripts/"*.sh
 chmod 755 "${CONFIG_DIR}/hypr/scripts/theme-gen.py"
 
+# Onthoud waar deze rice staat, zodat de update-knop in Waybar update.sh vindt.
+printf '%s\n' "${REPO_DIR}" > "${CONFIG_DIR}/hypr/.repo-path"
+
 # Bestandskoppelingen: tekst → Kate, pdf → Okular, beeld → Gwenview, enz.
 # Het script vult ~/.config/mimeapps.list aan en herbouwt de KDE-servicecache
 # met XDG_MENU_PREFIX=plasma-, zodat Dolphin de standaardapps vindt.

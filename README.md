@@ -12,8 +12,8 @@ De qtile-opzet die al op deze machine staat blijft gewoon werken.
 * **Hyprland 0.53** — afgeronde hoeken (14 px), gaten, blur, schaduwen en vloeiende animaties.
 * **Waybar** — workspaces met pictogrammen, venstertitel, klok met Nederlandse
   kalender (muisklik), weer voor Eindhoven (Open-Meteo), muziekspeler,
-  systeemvak, netwerk, bluetooth, volume, CPU, geheugen, accu, wallpaper-knop
-  en power-knop.
+  systeemvak, netwerk, bluetooth, volume, CPU, geheugen, accu, update-knop,
+  wallpaper-knop en power-knop.
 * **Automatische wallpaperwissel** — elke 10 minuten, via een systemd-user-timer
   die alleen draait als Hyprland de actieve sessie is.
 * **Kleuren die meebewegen** — pywal16 haalt het palet uit de wallpaper; dat palet
@@ -75,6 +75,7 @@ maar ook de onderdelen die niet uit de Kubuntu-repositories komen:
 
 | Bron | Wat het script doet |
 | --- | --- |
+| Flatpak (apps en runtimes) | `flatpak update -y`, voor de systeem- en gebruikersinstallatie |
 | pywal16 (PyPI) | `pipx upgrade pywal16`, of installeren als het ontbreekt |
 | JetBrainsMono Nerd Font (GitHub) | de nieuwste release downloaden als die nieuwer is |
 | hyprlock (GitHub-broncode) | een nieuwe release bouwen naar `/usr/local/bin` |
@@ -82,9 +83,17 @@ maar ook de onderdelen die niet uit de Kubuntu-repositories komen:
 
 Alleen de pakketten die in `packages/apt.txt` staan en al geïnstalleerd zijn,
 worden bijgewerkt; je hele systeem wordt niet geüpgraded. Met `--no-apt` sla je
-de Ubuntu-pakketten over en met `--no-config` de configuraties. `--check`
-wijzigt niets en gebruikt de bestaande apt-pakketlijsten; heb je net
+de Ubuntu-pakketten over, met `--no-flatpak` de Flatpaks en met `--no-config`
+de configuraties. `--check` wijzigt niets en gebruikt de bestaande
+apt-pakketlijsten; heb je net
 `sudo apt-get update` gedraaid, dan is de controle het meest actueel.
+
+In Waybar staat een update-knop (het downloadpictogram). De knop controleert
+hooguit één keer per uur op de achtergrond; staan er updates klaar, dan toont
+hij het aantal en kleurt hij geel. Klik erop om `update.sh` in een terminal te
+openen, of klik met de rechtermuisknop om alleen de controle te bekijken. Het
+pictogram gebruikt de repository die `install.sh` in
+`~/.config/hypr/.repo-path` heeft vastgelegd.
 
 ### Inloggen
 
@@ -243,8 +252,8 @@ Hyprland/
 │   ├── hyprlock.template.conf  vergrendelscherm (thema wordt ingevuld)
 │   ├── mimeapps.list           standaardapps voor Dolphin en andere apps
 │   └── scripts/                set-wallpaper, wallpaper-pick/rotate, theme-gen,
-│                               apply-default-apps, screenshot, power-menu,
-│                               lock, clipboard, …
+│                               apply-default-apps, update-check, screenshot,
+│                               power-menu, lock, clipboard, …
 ├── waybar/, wofi/, mako/, wlogout/   configuraties van de bar en overlays
 ├── systemd/                    wallpaper-timer (service + timer)
 ├── packages/

@@ -207,6 +207,38 @@ window#waybar {
     color: @error;
 }
 
+/* ---------- updates ---------- */
+
+#custom-updates {
+    color: @muted;
+    background-color: alpha(@surface2, 0.55);
+    font-size: 15px;
+    padding: 0 11px;
+    margin: 3px 2px;
+    border-radius: 11px;
+}
+
+#custom-updates:hover {
+    color: @fg;
+    background-color: alpha(@surface3, 0.9);
+}
+
+#custom-updates.has-updates {
+    color: @warning;
+    background-color: alpha(@warning, 0.14);
+    font-weight: 700;
+}
+
+#custom-updates.has-updates:hover {
+    color: @bg;
+    background-color: @warning;
+}
+
+#custom-updates.unavailable {
+    color: @error;
+    background-color: alpha(@error, 0.12);
+}
+
 /* ---------- wallpaper en power ---------- */
 
 #custom-wallpaper {
