@@ -1,0 +1,101 @@
+/* wlogout — compact power-menu. Kleuren via colors.css (per wallpaper). */
+
+@import url("file://__CONFIG_DIR__/wlogout/colors.css");
+
+* {
+    font-family: "Inter", "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 15px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 30px;
+}
+
+window {
+    background-color: alpha(@bg, 0.62);
+}
+
+/* Eén rij met vijf rustige kaarten. De afmetingen komen uit
+   power-menu.sh, zodat het menu op elk scherm gecentreerd blijft. */
+button {
+    background-color: alpha(@surface2, 0.92);
+    background-image: none;
+    color: @fg;
+    border: 1px solid alpha(@outline, 0.55);
+    border-radius: 16px;
+    margin: 0;
+    padding: 0 10px 15px 10px;
+    box-shadow: 0 8px 24px alpha(@shadow, 0.32);
+    transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+button:focus {
+    outline: none;
+    background-color: alpha(@surface2, 0.92);
+    box-shadow: 0 8px 24px alpha(@shadow, 0.32);
+}
+
+button:hover {
+    background-color: alpha(@surface3, 0.96);
+    color: @fg;
+    border-color: alpha(@primary, 0.8);
+}
+
+button:active {
+    background-color: alpha(@surface3, 1);
+}
+
+label {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* ---------- iconen en accenten per actie ---------- */
+
+#lock {
+    background-image: url("file://__CONFIG_DIR__/wlogout/icons/lock.svg");
+    border-color: alpha(@primary, 0.5);
+}
+
+#lock:hover {
+    background-color: alpha(@primary, 0.2);
+    border-color: @primary;
+}
+
+#logout {
+    background-image: url("file://__CONFIG_DIR__/wlogout/icons/logout.svg");
+}
+
+#logout:hover {
+    background-color: alpha(@secondary, 0.16);
+    border-color: @secondary;
+}
+
+#suspend {
+    background-image: url("file://__CONFIG_DIR__/wlogout/icons/suspend.svg");
+    border-color: alpha(@tertiary, 0.45);
+}
+
+#suspend:hover {
+    background-color: alpha(@tertiary, 0.18);
+    border-color: @tertiary;
+}
+
+#reboot {
+    background-image: url("file://__CONFIG_DIR__/wlogout/icons/reboot.svg");
+    border-color: alpha(@warning, 0.45);
+}
+
+#reboot:hover {
+    background-color: alpha(@warning, 0.18);
+    border-color: @warning;
+}
+
+#shutdown {
+    background-image: url("file://__CONFIG_DIR__/wlogout/icons/shutdown.svg");
+    border-color: alpha(@error, 0.5);
+}
+
+#shutdown:hover {
+    background-color: alpha(@error, 0.18);
+    border-color: @error;
+}

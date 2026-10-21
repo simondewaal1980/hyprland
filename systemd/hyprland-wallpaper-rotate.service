@@ -1,0 +1,11 @@
+[Unit]
+Description=Hyprland: wissel de wallpaper en werk het pywal-kleurenschema bij
+Documentation=file:///home/simon/Projecten/Hyprland/README.md
+
+[Service]
+Type=oneshot
+# ~/.local/bin bevat 'wal' (pipx).
+Environment=PATH=%h/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# Alleen wisselen als Hyprland de actieve sessie is (niet onder Plasma/Qtile).
+ExecCondition=/usr/bin/pgrep -x Hyprland
+ExecStart=%h/.config/hypr/scripts/wallpaper-rotate.sh

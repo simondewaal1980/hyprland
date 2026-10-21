@@ -1,0 +1,64 @@
+# Software voor de Hyprland-desktopopzet (Ubuntu/Debian).
+#
+# In één keer installeren:
+#   xargs -a packages/apt.txt sudo apt-get install -y --no-install-recommends
+#
+# Of gebruik: ./install.sh --packages
+# (dat doet apt-get update + deze lijst + pywal16 via pipx.)
+
+# Compositor en Wayland-hulpjes
+hyprland
+hyprpaper
+hyprlock
+hypridle
+hyprpicker
+hyprpolkitagent
+hyprland-qtutils
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+
+# Bar, menu's en meldingen
+waybar
+wofi
+rofi
+mako-notifier
+wlogout
+libnotify-bin
+
+# Terminal en vensters
+kitty
+xdg-utils
+
+# Schermafdrukken, klembord
+grim
+slurp
+swappy
+wl-clipboard
+cliphist
+
+# Thema's en uiterlijk
+qt6ct
+qt5ct
+nwg-look
+papirus-icon-theme
+bibata-cursor-theme
+fonts-inter
+fonts-jetbrains-mono
+fonts-noto-color-emoji
+
+# Systeemhulpjes in de bar
+blueman
+network-manager-gnome
+brightnessctl
+playerctl
+
+# Gereedschap
+imagemagick
+jq
+curl
+unzip
+pipx
+python3
+
+# Wallpaperkleuren (pywal16) staat niet in apt:
+#   pipx install pywal16

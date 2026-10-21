@@ -1,0 +1,216 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 40,
+  "spacing": 4,
+  "margin-top": 8,
+  "margin-bottom": 0,
+  "margin-left": 10,
+  "margin-right": 10,
+  "reload_style_on_change": true,
+
+  "modules-left": [
+    "custom/launcher",
+    "hyprland/workspaces",
+    "hyprland/window"
+  ],
+  "modules-center": [
+    "clock",
+    "mpris"
+  ],
+  "modules-right": [
+    "custom/weather",
+    "custom/notification",
+    "tray",
+    "network",
+    "bluetooth",
+    "pulseaudio",
+    "cpu",
+    "memory",
+    "battery",
+    "custom/wallpaper",
+    "custom/power"
+  ],
+
+  "custom/launcher": {
+    "format": "\uF135",
+    "tooltip": true,
+    "tooltip-format": "Applicaties  (Super+D)",
+    "on-click": "wofi --show drun",
+    "on-click-right": "wofi --show run"
+  },
+
+  "hyprland/workspaces": {
+    "format": "{icon}",
+    "format-icons": {
+      "1": "\uf120",
+      "2": "\uf121",
+      "3": "\uf0ac",
+      "4": "\uf001",
+      "5": "\uf07b",
+      "6": "\uf086",
+      "7": "\uf0e0",
+      "8": "\uf11b",
+      "9": "\uf013",
+      "10": "\uf02d",
+      "special:magic": "\uf0d0",
+      "default": "\uf07b"
+    },
+    "on-click": "activate",
+    "all-outputs": true,
+    "warp-on-scroll": false,
+    "persistent-workspaces": {
+      "*": 5
+    }
+  },
+
+  "hyprland/window": {
+    "format": "{title}",
+    "max-length": 60,
+    "separate-outputs": true
+  },
+
+  "clock": {
+    "locale": "nl_NL.UTF-8",
+    "format": "{:L%a %d %b  %H:%M}",
+    "format-alt": "{:L%A %d %B %Y}",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col": 3,
+      "weeks-pos": "right",
+      "on-scroll": 1
+    },
+    "actions": {
+      "on-click-right": "mode",
+      "on-scroll-up": "shift_up",
+      "on-scroll-down": "shift_down"
+    }
+  },
+
+  "mpris": {
+    "format": "{player_icon}  {title}",
+    "format-paused": "{player_icon}  {title}",
+    "format-stopped": "",
+    "player-icons": {
+      "default": "\uF001",
+      "spotify": "\uF1BC",
+      "firefox": "\uF269",
+      "chromium": "\uF268",
+      "google-chrome": "\uF268"
+    },
+    "max-length": 42,
+    "tooltip-format": "{player} — {title}\n{artist}\n{album}",
+    "on-click": "playerctl play-pause",
+    "on-click-right": "playerctl next"
+  },
+
+  "custom/notification": {
+    "exec": "~/.config/hypr/scripts/notification-status.sh",
+    "interval": 5,
+    "format": "{}",
+    "tooltip": true,
+    "tooltip-format": "Meldingen aan/uit  (klik om te wisselen)",
+    "on-click": "~/.config/hypr/scripts/toggle-dnd.sh",
+    "on-click-right": "makoctl dismiss -a"
+  },
+
+  "custom/weather": {
+    "exec": "~/.config/hypr/scripts/weather.sh",
+    "return-type": "json",
+    "interval": 900,
+    "tooltip": true,
+    "on-click": "xdg-open https://wttr.in/Eindhoven"
+  },
+
+  "tray": {
+    "icon-size": 18,
+    "spacing": 8
+  },
+
+  "network": {
+    "interval": 3,
+    "format-wifi": "\uF1EB  {essid}",
+    "format-ethernet": "\uF6FF  {ifname}",
+    "format-linked": "\uF6FF  {ifname}",
+    "format-disconnected": "\uF00D  offline",
+    "tooltip-format-wifi": "{essid}\n{ipaddr}/{cidr}\nSignaal: {signalStrength}%",
+    "tooltip-format-ethernet": "{ifname}\n{ipaddr}/{cidr}",
+    "tooltip-format-disconnected": "Geen netwerkverbinding",
+    "max-length": 24,
+    "on-click": "nm-connection-editor"
+  },
+
+  "bluetooth": {
+    "format": "\uF294",
+    "format-connected": "\uF294  {num_connections}",
+    "format-disabled": "\uF00D",
+    "tooltip-format": "{controller_alias}\n{controller_address}",
+    "tooltip-format-connected": "{controller_alias}\n{device_enumerate}",
+    "on-click": "blueman-manager"
+  },
+
+  "pulseaudio": {
+    "format": "{icon}  {volume}%",
+    "format-muted": "\uF026  gedempt",
+    "format-icons": {
+      "default": [
+        "\uF026",
+        "\uF027",
+        "\uF028"
+      ]
+    },
+    "scroll-step": 5,
+    "tooltip-format": "{desc}",
+    "on-click": "pavucontrol",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+
+  "cpu": {
+    "interval": 3,
+    "format": "\uF2DB  {usage}%",
+    "on-click": "kitty -e htop"
+  },
+
+  "memory": {
+    "interval": 5,
+    "format": "\uF538  {percentage}%",
+    "tooltip-format": "{used} / {total} GiB",
+    "on-click": "kitty -e htop"
+  },
+
+  "battery": {
+    "states": {
+      "good": 95,
+      "warning": 30,
+      "critical": 15
+    },
+    "format": "{icon}  {capacity}%",
+    "format-charging": "\uF0E7  {capacity}%",
+    "format-plugged": "\uF1E6  {capacity}%",
+    "format-icons": [
+      "\uF244",
+      "\uF243",
+      "\uF242",
+      "\uF241",
+      "\uF240"
+    ],
+    "tooltip-format": "{timeTo}\n{power:.2f} W",
+    "on-click": "~/.config/hypr/scripts/power-menu.sh"
+  },
+
+  "custom/wallpaper": {
+    "format": "\uF03E",
+    "tooltip": true,
+    "tooltip-format": "Wallpaper: klik = volgende, rechts = kiezen",
+    "on-click": "~/.config/hypr/scripts/wallpaper-rotate.sh --notify",
+    "on-click-right": "~/.config/hypr/scripts/wallpaper-pick.sh"
+  },
+
+  "custom/power": {
+    "format": "\uF011",
+    "tooltip": true,
+    "tooltip-format": "Power-menu  (Super+Escape)",
+    "on-click": "~/.config/hypr/scripts/power-menu.sh"
+  }
+}

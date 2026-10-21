@@ -1,0 +1,23 @@
+# mako — Wayland-notificaties.
+# De kleuren worden per wallpaper in ~/.config/mako/colors geschreven.
+
+include=~/.config/mako/colors
+
+font=Inter 10
+width=380
+height=180
+# Ruimte boven de notificatie voor de zwevende Waybar.
+margin=64,12,12,12
+padding=14
+border-size=2
+border-radius=14
+anchor=top-right
+layer=overlay
+default-timeout=6000
+ignore-timeout=0
+max-visible=5
+max-icon-size=48
+icon-path=/usr/share/icons/Papirus-Dark
+markup=1
+format=<b>%s</b>\n%b
+group-by=app-name

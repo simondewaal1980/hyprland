@@ -1,0 +1,68 @@
+/* wofi — launcher. Kleuren via colors.css (per wallpaper). */
+
+@import url("file://__CONFIG_DIR__/wofi/colors.css");
+
+* {
+    font-family: "Inter", "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 15px;
+}
+
+window {
+    background-color: alpha(@bg, 0.96);
+    border: 1px solid alpha(@outline, 0.8);
+    border-radius: 18px;
+    padding: 14px;
+}
+
+#outer-box {
+    background-color: transparent;
+}
+
+#input {
+    margin: 2px 4px 12px 4px;
+    padding: 12px 16px;
+    border: 1px solid alpha(@outline, 0.55);
+    border-radius: 12px;
+    background-color: alpha(@surface2, 0.9);
+    color: @fg;
+}
+
+#input:focus {
+    border-color: @primary;
+}
+
+#scroll {
+    margin: 0;
+    background: transparent;
+}
+
+#inner-box {
+    background: transparent;
+}
+
+#entry {
+    padding: 8px 12px;
+    border-radius: 10px;
+    color: @fg;
+}
+
+#entry:hover {
+    background-color: alpha(@surface3, 0.7);
+}
+
+#entry:selected {
+    background-color: @primary;
+    color: @on_primary;
+}
+
+#text {
+    color: inherit;
+}
+
+#text:selected {
+    color: @on_primary;
+}
+
+#img {
+    margin-right: 10px;
+}

@@ -1,0 +1,15 @@
+# wofi — applicatielauncher (Super+D)
+# Kleuren staan in colors.css en worden per wallpaper bijgewerkt.
+
+show=drun
+prompt=Zoeken…
+width=640
+height=420
+location=center
+allow_images=true
+image_size=28
+insensitive=true
+matching=multi
+term=kitty
+no_actions=true
+hide_scroll=false

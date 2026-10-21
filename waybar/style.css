@@ -1,0 +1,251 @@
+/* Waybar — moderne zwevende bar.
+ * Kleuren komen uit colors.css (thema-gen.py, per wallpaper).
+ */
+
+/* Geen file:// hier: Waybar's reload_style_on_change kan zo'n URL niet naar een
+ * pad herleiden en zou colors.css dus nooit volgen. Een absoluut pad werkt
+ * zowel voor GTK als voor de inotify-watcher van Waybar. */
+@import url("__CONFIG_DIR__/waybar/colors.css");
+
+* {
+    font-family: "Inter", "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+}
+
+window#waybar {
+    background-color: alpha(@bg, 0.88);
+    color: @fg;
+    border: 1px solid alpha(@outline, 0.55);
+    border-radius: 18px;
+}
+
+.modules-left {
+    margin-left: 6px;
+}
+
+.modules-right {
+    margin-right: 6px;
+}
+
+/* ---------- launcher ---------- */
+
+#custom-launcher {
+    color: @on_primary;
+    background-color: @primary;
+    font-size: 16px;
+    padding: 0 13px;
+    margin: 3px 8px 3px 2px;
+    border-radius: 11px;
+}
+
+#custom-launcher:hover {
+    background-color: alpha(@primary, 0.78);
+}
+
+/* ---------- workspaces ---------- */
+
+#workspaces button {
+    color: @muted;
+    background-color: transparent;
+    font-size: 15px;
+    min-width: 22px;
+    padding: 0 8px;
+    margin: 3px 2px;
+    border-radius: 9px;
+    transition: all 180ms ease;
+}
+
+#workspaces button:hover {
+    color: @fg;
+    background-color: alpha(@surface3, 0.85);
+}
+
+#workspaces button.active {
+    color: @on_primary;
+    background-color: @primary;
+    font-weight: 700;
+}
+
+#workspaces button.active:hover {
+    color: @on_primary;
+    background-color: alpha(@primary, 0.85);
+}
+
+#workspaces button.empty {
+    color: alpha(@muted, 0.58);
+}
+
+#workspaces button.urgent {
+    color: @on_error;
+    background-color: @error;
+}
+
+/* ---------- venstertitel ---------- */
+
+#window {
+    color: @muted;
+    font-size: 12.5px;
+    padding: 0 12px;
+}
+
+/* ---------- klok en muziek ---------- */
+
+#clock {
+    color: @primary;
+    background-color: alpha(@primary, 0.12);
+    border: 1px solid alpha(@primary, 0.28);
+    padding: 0 16px;
+    margin: 3px 4px;
+    border-radius: 11px;
+    font-weight: 600;
+}
+
+#mpris {
+    color: @secondary;
+    background-color: alpha(@surface2, 0.55);
+    padding: 0 12px;
+    margin: 3px 4px;
+    border-radius: 11px;
+}
+
+#mpris.paused {
+    color: @muted;
+}
+
+/* ---------- weer ---------- */
+
+#custom-weather {
+    color: @secondary;
+    background-color: alpha(@secondary, 0.11);
+    padding: 0 11px;
+    margin: 3px 2px;
+    border-radius: 11px;
+    font-weight: 600;
+}
+
+#custom-weather:hover {
+    color: @on_secondary;
+    background-color: @secondary;
+}
+
+#custom-weather.unavailable {
+    color: @muted;
+    background-color: alpha(@surface2, 0.55);
+}
+
+#custom-weather.unavailable:hover {
+    color: @fg;
+    background-color: alpha(@surface3, 0.9);
+}
+
+/* ---------- systeemvak ---------- */
+
+#tray {
+    background-color: alpha(@surface2, 0.55);
+    padding: 0 9px;
+    margin: 3px 4px;
+    border-radius: 11px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+/* ---------- statusmodules ---------- */
+
+#custom-notification,
+#network,
+#bluetooth,
+#pulseaudio,
+#cpu,
+#memory,
+#battery {
+    background-color: alpha(@surface2, 0.55);
+    color: @fg;
+    padding: 0 10px;
+    margin: 3px 2px;
+    border-radius: 11px;
+}
+
+#custom-notification {
+    color: @muted;
+}
+
+#custom-notification:hover,
+#network:hover,
+#bluetooth:hover,
+#pulseaudio:hover,
+#cpu:hover,
+#memory:hover,
+#battery:hover {
+    background-color: alpha(@surface3, 0.9);
+}
+
+#network.disconnected,
+#bluetooth.disabled,
+#bluetooth.off,
+#pulseaudio.muted {
+    color: @error;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: @success;
+}
+
+#battery.warning {
+    color: @warning;
+}
+
+#battery.critical {
+    color: @error;
+}
+
+/* ---------- wallpaper en power ---------- */
+
+#custom-wallpaper {
+    color: @secondary;
+    background-color: alpha(@secondary, 0.11);
+    font-size: 15px;
+    padding: 0 11px;
+    margin: 3px 2px;
+    border-radius: 11px;
+}
+
+#custom-wallpaper:hover {
+    color: @on_secondary;
+    background-color: @secondary;
+}
+
+#custom-power {
+    color: @error;
+    background-color: alpha(@error, 0.12);
+    font-size: 15px;
+    padding: 0 12px;
+    margin: 3px 2px 3px 4px;
+    border-radius: 11px;
+}
+
+#custom-power:hover {
+    color: @on_error;
+    background-color: @error;
+}
+
+/* ---------- tooltip ---------- */
+
+tooltip {
+    background-color: alpha(@surface2, 0.98);
+    border: 1px solid @outline;
+    border-radius: 10px;
+}
+
+tooltip label {
+    color: @fg;
+    padding: 6px 8px;
+}
