@@ -18,8 +18,8 @@ De qtile-opzet die al op deze machine staat blijft gewoon werken.
   die alleen draait als Hyprland de actieve sessie is.
 * **Kleuren die meebewegen** — pywal16 haalt het palet uit de wallpaper; dat palet
   komt terecht in Hyprland, Waybar, wofi, rofi, wlogout, mako, kitty, hyprlock,
-  **GTK-apps** (via een gegenereerd GTK-thema) en **Qt/KDE-apps** (Breeze + het
-  KDE-kleurenschema *Pywal*).
+  **OpenCode**, **GTK-apps** (via een gegenereerd GTK-thema) en **Qt/KDE-apps**
+  (Breeze + het KDE-kleurenschema *Pywal*).
 * **Vergrendelen en sluimeren** — hyprlock (met klok, datum en wachtwoordveld) en
   hypridle: na 5 minuten vergrendelen, na 10 minuten het scherm uit.
   Let op: Ubuntu 26.04 levert hyprlock 0.9.2, die kort na het vergrendelen
@@ -28,6 +28,9 @@ De qtile-opzet die al op deze machine staat blijft gewoon werken.
 * **Hulpmiddelen** — wlogout power-menu, klembordgeschiedenis (cliphist),
   schermafdrukken (grim/slurp/swappy), kleurenpicker (hyprpicker),
   blueman en nm-applet in het systeemvak.
+* **Bestandskoppelingen** — Dolphin opent tekst en code in Kate, pdf's in
+  Okular, afbeeldingen in Gwenview, video in Haruna, muziek in Elisa,
+  archieven in Ark en kantoordocumenten in LibreOffice.
 
 ## Installeren
 
@@ -49,8 +52,12 @@ cd ~/Projecten/Hyprland
    `.hyprland-rice`-marker, zodat een tweede keer installeren geen nieuwe back-up maakt.
 4. Voegt aan `~/.config/kitty/kitty.conf` één regel toe:
    `include ~/.config/kitty/hyprland-theme.conf` (kitty houdt dus je eigen instellingen).
-5. Installeert en start de wallpaper-timer en genereert meteen het eerste kleurenschema.
-6. Controleert of de locale `nl_NL.UTF-8` en een werkende hyprlock-versie aanwezig
+   Is OpenCode aanwezig, dan zet het script in `~/.config/opencode/cli.json`
+   het thema op `wal`; overige OpenCode-instellingen blijven staan.
+5. Stelt de bestandskoppelingen in (`~/.config/mimeapps.list`) en herbouwt de
+   KDE-servicecache, zodat Dolphin bestanden met het juiste programma opent.
+6. Installeert en start de wallpaper-timer en genereert meteen het eerste kleurenschema.
+7. Controleert of de locale `nl_NL.UTF-8` en een werkende hyprlock-versie aanwezig
    zijn en waarschuwt zo nodig (zie [Vergrendelscherm](#vergrendelscherm-hyprlock)).
 
 > Draai je `./install.sh --packages` en vraagt `sudo` om een wachtwoord? Dat is
@@ -100,6 +107,38 @@ De belangrijkste (de volledige lijst staat in [docs/sneltoetsen.md](docs/sneltoe
 | `Super` + `Escape` | Power-menu (wlogout) |
 | `Super` + `R` / `U` | Hyprland / Waybar opnieuw laden |
 
+## Bestandskoppelingen (Dolphin)
+
+Dolphin gebruikt de standaardapps uit [`hypr/mimeapps.list`](hypr/mimeapps.list):
+
+| Bestandstype | Programma |
+| --- | --- |
+| Tekst, code en configuratie | Kate |
+| Pdf, e-books en strips | Okular |
+| Afbeeldingen | Gwenview |
+| Video | Haruna |
+| Muziek | Elisa |
+| Archief (zip, rar, 7z, tar, …) | Ark |
+| Word, Excel, PowerPoint en LibreOffice | LibreOffice |
+| Webpagina's en links | Google Chrome |
+| Mappen | Dolphin |
+
+`install.sh` zet deze koppelingen met `xdg-mime` in `~/.config/mimeapps.list`.
+Koppelingen voor andere typen en eigen URL-schema's die daar al in staan,
+blijven bewaard. Aanpassen? Wijzig `hypr/mimeapps.list` en draai:
+
+```bash
+./install.sh
+# of, zonder de rest opnieuw te installeren:
+~/.config/hypr/scripts/apply-default-apps.sh
+```
+
+Het script bouwt daarna de KDE-servicecache opnieuw op met
+`XDG_MENU_PREFIX=plasma-`. Die variabele staat ook in `hyprland.conf`. Zonder
+hem vindt KDE's KService de applicaties niet: Dolphin toont dan een leeg
+"Openen met"-venster of doet niets. Na de eerste keer instellen is een herstart
+van Dolphin (of opnieuw inloggen) genoeg.
+
 ## Hoe het thema werkt
 
 ```
@@ -127,10 +166,21 @@ waarschuwingen) en schrijft:
 | `~/.config/wofi/colors.css`, `~/.config/wlogout/colors.css` | menu's en power-menu |
 | `~/.config/mako/colors` | meldingen |
 | `~/.config/kitty/hyprland-theme.conf` | kitty-kleuren en -opmaak |
+| `~/.config/opencode/themes/wal.json` | OpenCode (themanaam `wal`) |
 | `~/.cache/hypr/palette.json` | het volledige palet, voor eigen scripts |
 
 Kleuren zijn dus **nooit handmatig**: ze volgen de wallpaper. Wil je een andere
 sfeer? Kies een andere foto.
+
+### OpenCode
+
+`theme-gen.py` schrijft bij elke wissel een compleet OpenCode-thema naar
+`~/.config/opencode/themes/wal.json`; in `~/.config/opencode/cli.json` verwijst
+`theme.name` naar `wal`. OpenCode leest thema's bij het starten, dus een
+draaiende sessie pakt de nieuwe kleuren pas na een herstart op. Achtergrond,
+tekst en accenten komen uit de wallpaper; rood, groen en geel blijven vaste,
+herkenbare kleuren voor fouten, waarschuwingen en succes. Heb je OpenCode later
+geïnstalleerd, draai dan één keer `./install.sh` om `theme.name` op `wal` te zetten.
 
 ### Eigen wallpapers toevoegen
 
@@ -191,8 +241,10 @@ Hyprland/
 │   ├── hypridle.conf           vergrendelen/sluimeren
 │   ├── hyprpaper.conf          wallpaper-daemon
 │   ├── hyprlock.template.conf  vergrendelscherm (thema wordt ingevuld)
+│   ├── mimeapps.list           standaardapps voor Dolphin en andere apps
 │   └── scripts/                set-wallpaper, wallpaper-pick/rotate, theme-gen,
-│                               screenshot, power-menu, lock, clipboard, …
+│                               apply-default-apps, screenshot, power-menu,
+│                               lock, clipboard, …
 ├── waybar/, wofi/, mako/, wlogout/   configuraties van de bar en overlays
 ├── systemd/                    wallpaper-timer (service + timer)
 ├── packages/
@@ -207,7 +259,8 @@ Hyprland/
 * **Sneltoetsen, animaties, regels** → `hypr/hyprland.conf`
 * **Bar-indeling** → `waybar/config.jsonc` · **bar-opmaak** → `waybar/style.css`
 * **Meldingen** → `mako/config` · **power-menu** → `wlogout/layout`
-* **Paletafleiding** → `hypr/scripts/theme-gen.py`
+* **Standaardapps** → `hypr/mimeapps.list` (daarna `./install.sh`)
+* **Paletafleiding** → `hypr/scripts/theme-gen.py` (inclusief het OpenCode-thema)
 
 Pas je iets aan in deze map, draai dan opnieuw `./install.sh`; kleuren zelf worden
 bij elke wallpaperwissel automatisch bijgewerkt in `~/.config`.
@@ -220,7 +273,9 @@ bij elke wallpaperwissel automatisch bijgewerkt in `~/.config`.
 | Vergrendelen mislukt of scherm valt terug | `./packages/build-hyprlock.sh` (Ubuntu's 0.9.2 crasht) |
 | Geen kleuren na inloggen | `pipx install pywal16`, dan `Super` + `Shift` + `W` |
 | Bar of menu ziet er oud uit | `Super` + `Shift` + `R` (kleuren) of `Super` + `U` (bar) |
+| OpenCode toont nog oude kleuren | OpenCode opnieuw starten; het thema wordt bij het starten gelezen |
 | Iets werkt niet na een aanpassing | `Super` + `R` (Hyprland herladen) |
+| Dolphin opent niets of toont een leeg "Openen met"-venster | `~/.config/hypr/scripts/apply-default-apps.sh` en Dolphin opnieuw starten (of opnieuw inloggen). Controleer met `echo "$XDG_MENU_PREFIX"` of `plasma-` actief is. |
 | Configuratie controleren | `Hyprland --verify-config -c ~/.config/hypr/hyprland.conf` |
 | Logboek bekijken | `less "$XDG_RUNTIME_DIR"/hypr/*/hyprland.log` |
 | Spotify sluit tijdens een wallpaperwissel | Opgelost: Waybar herlaadt zijn kleuren nu zelf. Na een update één keer `pkill -x waybar; hyprctl dispatch exec waybar`. |

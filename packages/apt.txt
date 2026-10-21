@@ -29,6 +29,28 @@ libnotify-bin
 kitty
 xdg-utils
 
+# Bestandsbeheer en standaardapps (Dolphin opent hiermee de juiste bestanden)
+dolphin
+dolphin-plugins
+kate
+okular
+gwenview
+haruna
+elisa
+ark
+kio-extras
+kio-admin
+kde-cli-tools
+plasma-integration
+libkf6service-bin
+desktop-file-utils
+
+# Kantoordocumenten
+libreoffice-writer
+libreoffice-calc
+libreoffice-impress
+libreoffice-draw
+
 # Schermafdrukken, klembord
 grim
 slurp

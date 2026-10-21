@@ -3,7 +3,8 @@
 
 Aangeroepen door set-wallpaper.sh, nadat `wal` een nieuw palet heeft
 gemaakt. Schrijft kleuren voor Hyprland, Waybar, wofi, wlogout, mako,
-kitty en Hyprlock. De basis blijft donker, ook bij een lichte wallpaper.
+kitty, Hyprlock en OpenCode. De basis blijft donker, ook bij een lichte
+wallpaper.
 """
 
 from __future__ import annotations
@@ -11,6 +12,7 @@ from __future__ import annotations
 import colorsys
 import json
 import os
+import shutil
 import sys
 from pathlib import Path
 
@@ -91,6 +93,246 @@ def readable_on(background, color, target: float = 4.0):
 def load_palette() -> dict:
     with WAL_JSON.open(encoding="utf-8") as fh:
         return json.load(fh)
+
+
+def hue_scale(anchor, bg) -> dict[str, str]:
+    """Maak de negen stappen van een OpenCode-hue (donker thema)."""
+    return {
+        "100": to_hex(mix(anchor, WHITE, 0.48)),
+        "200": to_hex(anchor),
+        "300": to_hex(mix(anchor, bg, 0.18)),
+        "400": to_hex(mix(anchor, bg, 0.34)),
+        "500": to_hex(mix(anchor, bg, 0.50)),
+        "600": to_hex(mix(anchor, bg, 0.65)),
+        "700": to_hex(mix(anchor, bg, 0.78)),
+        "800": to_hex(mix(anchor, bg, 0.88)),
+        "900": to_hex(mix(anchor, bg, 0.94)),
+    }
+
+
+def wallpaper_hue(color, fallback, bg):
+    """Gebruik een paletkleur als hij genoeg kleur en contrast heeft."""
+    if color is None or saturation(color) < 0.16 or contrast(bg, color) < 1.8:
+        color = fallback
+    return readable_on(bg, color, 3.2)
+
+
+def nearest_hue(color, anchors: dict) -> str:
+    return min(
+        anchors,
+        key=lambda name: hue_distance(hue(color), hue(anchors[name])),
+    )
+
+
+def write_opencode_theme(
+    *,
+    bg,
+    fg,
+    muted,
+    outline,
+    surface,
+    surface2,
+    surface3,
+    primary,
+    secondary,
+    tertiary,
+    source_colors: dict,
+) -> None:
+    """Schrijf ~/.config/opencode/themes/wal.json uit het pywal-palet.
+
+    OpenCode leest zijn thema's bij het starten; een draaiende sessie pakt de
+    nieuwe kleuren dus pas na een herstart op.
+    """
+    theme_dir = CONFIG / "opencode" / "themes"
+    theme_dir.mkdir(parents=True, exist_ok=True)
+
+    # Vaste semantische tinten blijven herkenbaar; blauw, cyaan en paars
+    # komen bij voorkeur uit de wallpaper zelf.
+    anchors = {
+        "red": ERROR,
+        "orange": mix(ERROR, WARNING, 0.62),
+        "yellow": WARNING,
+        "green": SUCCESS,
+        "cyan": wallpaper_hue(source_colors.get("color6"), (118, 196, 220), bg),
+        "blue": wallpaper_hue(source_colors.get("color4"), (110, 165, 235), bg),
+        "purple": wallpaper_hue(source_colors.get("color5"), (190, 145, 230), bg),
+    }
+
+    # Laat accent en interactieve kleur precies bij de gekozen
+    # wallpaper-accenten aansluiten.
+    families = tuple(anchors)
+    primary_family = nearest_hue(primary, anchors)
+    anchors[primary_family] = primary
+    secondary_family = min(
+        (name for name in families if name != primary_family),
+        key=lambda name: hue_distance(hue(secondary), hue(anchors[name])),
+    )
+    anchors[secondary_family] = secondary
+    tertiary_family = nearest_hue(tertiary, anchors)
+    if tertiary_family not in (primary_family, secondary_family):
+        anchors[tertiary_family] = tertiary
+
+    hues = {
+        "gray": {
+            "100": to_hex(mix(fg, WHITE, 0.45)),
+            "200": to_hex(fg),
+            "300": to_hex(mix(bg, fg, 0.78)),
+            "400": to_hex(muted),
+            "500": to_hex(mix(bg, fg, 0.40)),
+            "600": to_hex(surface3),
+            "700": to_hex(surface2),
+            "800": to_hex(surface),
+            "900": to_hex(bg),
+        }
+    }
+    for name, anchor in anchors.items():
+        hues[name] = hue_scale(anchor, bg)
+    hues["accent"] = f"$hue.{primary_family}"
+    hues["interactive"] = f"$hue.{secondary_family}"
+    hues["neutral"] = "$hue.gray"
+
+    categorical = []
+    for name in (primary_family, secondary_family, "green", "cyan", "red"):
+        if name not in categorical:
+            categorical.append(name)
+
+    theme = {
+        "$schema": "https://opencode.ai/theme.json",
+        "base": {
+            "categorical": categorical,
+            "text": {
+                "base": "$hue.neutral.200",
+                "muted": "$hue.neutral.400",
+                "action": {
+                    "primary": {
+                        "base": "$hue.accent.200",
+                        "$disabled": "$hue.neutral.500",
+                        "$focused": "$hue.neutral.900",
+                        "$selected": "$hue.interactive.200",
+                    },
+                    "secondary": {
+                        "base": "$text.muted",
+                        "$hovered": "$text.base",
+                    },
+                    "destructive": {
+                        "base": "$hue.neutral.900",
+                        "$disabled": "$hue.neutral.500",
+                    },
+                },
+                "formfield": {
+                    "base": "$hue.neutral.200",
+                    "$hovered": "$hue.interactive.200",
+                    "$focused": "$hue.interactive.200",
+                    "$pressed": "$hue.interactive.200",
+                    "$disabled": "$hue.neutral.500",
+                    "$selected": "$hue.interactive.200",
+                },
+                "feedback": {
+                    "error": {"base": to_hex(ERROR)},
+                    "warning": {"base": to_hex(WARNING)},
+                    "success": {"base": to_hex(SUCCESS)},
+                    "info": {"base": "$hue.cyan.200"},
+                },
+            },
+            "background": {
+                "base": "$hue.neutral.900",
+                "raised": {
+                    "base": "$hue.neutral.800",
+                    "high": "$hue.neutral.700",
+                    "max": "$hue.neutral.600",
+                },
+                "action": {
+                    "primary": {
+                        "base": "transparent",
+                        "$hovered": "$hue.neutral.800",
+                        "$focused": "$hue.interactive.200",
+                        "$selected": "transparent",
+                    },
+                    "secondary": {
+                        "base": "transparent",
+                        "$hovered": "$hue.neutral.800",
+                    },
+                    "destructive": {"base": to_hex(ERROR)},
+                },
+                "formfield": {"base": "$background.base"},
+                "feedback": {
+                    "error": {"base": "$background.base"},
+                    "warning": {"base": "$background.base"},
+                    "success": {"base": "$background.base"},
+                    "info": {"base": "$background.base"},
+                },
+            },
+            "border": {"base": to_hex(outline)},
+            "scrollbar": {"base": to_hex(mix(outline, fg, 0.28))},
+            "diff": {
+                "text": {
+                    "added": to_hex(SUCCESS),
+                    "removed": to_hex(ERROR),
+                    "context": "$hue.neutral.400",
+                    "hunkHeader": "$hue.neutral.400",
+                },
+                "background": {
+                    "added": "$hue.green.900",
+                    "removed": "$hue.red.900",
+                    "context": "$hue.neutral.800",
+                },
+                "highlight": {
+                    "added": "$hue.green.100",
+                    "removed": "$hue.red.100",
+                },
+                "lineNumber": {
+                    "text": "$hue.neutral.400",
+                    "background": {
+                        "added": to_hex(mix(bg, SUCCESS, 0.08)),
+                        "removed": to_hex(mix(bg, ERROR, 0.08)),
+                    },
+                },
+            },
+            "syntax": {
+                "comment": "$hue.neutral.400",
+                "keyword": "$hue.accent.200",
+                "function": "$hue.interactive.200",
+                "variable": "$hue.red.200",
+                "string": "$hue.green.200",
+                "number": "$hue.orange.100",
+                "type": "$hue.cyan.100",
+                "operator": "$hue.cyan.200",
+                "punctuation": "$hue.neutral.200",
+            },
+            "markdown": {
+                "text": "$hue.neutral.200",
+                "heading": "$hue.accent.200",
+                "link": "$hue.interactive.200",
+                "linkText": "$hue.cyan.200",
+                "code": "$hue.green.200",
+                "blockQuote": "$hue.orange.100",
+                "emphasis": "$hue.orange.100",
+                "strong": "$hue.orange.200",
+                "horizontalRule": "$hue.neutral.400",
+                "listItem": "$hue.interactive.200",
+                "listEnumeration": "$hue.cyan.200",
+                "image": "$hue.interactive.200",
+                "imageText": "$hue.cyan.200",
+                "codeBlock": "$hue.neutral.200",
+            },
+            "@dialog": {
+                "background": {
+                    "base": "$background.raised.base",
+                    "action": {
+                        "primary": {
+                            "$hovered": "$background.raised.high",
+                        }
+                    },
+                }
+            },
+        },
+        "dark": {"hue": hues},
+    }
+
+    (theme_dir / "wal.json").write_text(
+        json.dumps(theme, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+
 
 
 def main() -> int:
@@ -324,6 +566,24 @@ color7 {palette["fg"]}
 color15 {palette["fg"]}
 """
     (CONFIG / "kitty" / "hyprland-theme.conf").write_text(kitty, encoding="utf-8")
+
+    # --- OpenCode ---------------------------------------------------------
+    # Alleen schrijven als OpenCode hier gebruikt wordt; de themanaam 'wal'
+    # staat in ~/.config/opencode/cli.json (zie install.sh).
+    if (CONFIG / "opencode").exists() or shutil.which("opencode"):
+        write_opencode_theme(
+            bg=bg,
+            fg=fg,
+            muted=muted,
+            outline=outline,
+            surface=surface,
+            surface2=surface2,
+            surface3=surface3,
+            primary=primary,
+            secondary=secondary,
+            tertiary=tertiary,
+            source_colors=base_colors,
+        )
 
     # --- Overige apps / scripts ------------------------------------------
     (CACHE / "hypr" / "palette.json").write_text(

@@ -2,7 +2,7 @@
 #
 # set-wallpaper.sh — kies een wallpaper, genereer het kleurenschema met pywal
 #                     en pas het toe op Hyprland, Waybar, wofi, wlogout,
-#                     mako, kitty, Hyprlock, GTK- en Qt/KDE-apps.
+#                     mako, kitty, Hyprlock, OpenCode, GTK- en Qt/KDE-apps.
 #
 # Gebruik:
 #   set-wallpaper.sh [pad/naar/afbeelding]
@@ -72,7 +72,8 @@ fi
 grep -v -e 'kitty_pywal' -e 'Failed to connect to unix' "${wal_log}" >&2 || true
 rm -f "${wal_log}"
 
-# 2. Alle themabestanden genereren (Hyprland, Waybar, wofi, mako, kitty, lock).
+# 2. Alle themabestanden genereren (Hyprland, Waybar, wofi, mako, kitty, lock,
+#    OpenCode).
 python3 "${SCRIPT_DIR}/theme-gen.py" "${img}"
 
 # 3. Wallpaper zetten via hyprpaper, als Hyprland draait.

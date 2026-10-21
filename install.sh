@@ -30,6 +30,10 @@ if ${install_packages}; then
         hyprland-qtutils waybar wofi mako-notifier rofi kitty \
         grim slurp wl-clipboard cliphist swappy \
         xdg-desktop-portal-hyprland xdg-desktop-portal-gtk \
+        dolphin dolphin-plugins kate okular gwenview haruna elisa ark \
+        kio-extras kio-admin kde-cli-tools plasma-integration \
+        libkf6service-bin desktop-file-utils \
+        libreoffice-writer libreoffice-calc libreoffice-impress libreoffice-draw \
         qt6ct qt5ct nwg-look papirus-icon-theme bibata-cursor-theme \
         blueman brightnessctl playerctl network-manager-gnome wlogout \
         fonts-inter fonts-jetbrains-mono fonts-noto-color-emoji \
@@ -114,6 +118,14 @@ done
 chmod 755 "${CONFIG_DIR}/hypr/scripts/"*.sh
 chmod 755 "${CONFIG_DIR}/hypr/scripts/theme-gen.py"
 
+# Bestandskoppelingen: tekst → Kate, pdf → Okular, beeld → Gwenview, enz.
+# Het script vult ~/.config/mimeapps.list aan en herbouwt de KDE-servicecache
+# met XDG_MENU_PREFIX=plasma-, zodat Dolphin de standaardapps vindt.
+echo ">> Bestandskoppelingen instellen…"
+if ! "${CONFIG_DIR}/hypr/scripts/apply-default-apps.sh"; then
+    echo "!! Bestandskoppelingen instellen is mislukt." >&2
+fi
+
 # Kitty: thema-include toevoegen zonder de bestaande config te vervangen.
 KITTY_DIR="${CONFIG_DIR}/kitty"
 mkdir -p "${KITTY_DIR}"
@@ -127,6 +139,56 @@ if [[ -f "${KITTY_DIR}/kitty.conf" ]]; then
 else
     printf '# Kitty — Hyprland-desktopopzet\ninclude ~/.config/kitty/hyprland-theme.conf\n' \
         > "${KITTY_DIR}/kitty.conf"
+fi
+
+# OpenCode: laat de TUI het gegenereerde 'wal'-thema gebruiken. Alleen het
+# theme-blok in cli.json wordt aangepast; andere instellingen blijven staan.
+OPENCODE_DIR="${CONFIG_DIR}/opencode"
+if [[ -d "${OPENCODE_DIR}" ]] || command -v opencode >/dev/null 2>&1; then
+    mkdir -p "${OPENCODE_DIR}/themes"
+    opencode_cli="${OPENCODE_DIR}/cli.json"
+    if [[ ! -e "${opencode_cli}" ]]; then
+        cat > "${opencode_cli}" <<'JSON'
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "theme": {
+    "name": "wal",
+    "mode": "dark"
+  }
+}
+JSON
+    elif ! python3 - "${opencode_cli}" <<'PY'
+import json
+import os
+import sys
+
+path = sys.argv[1]
+try:
+    with open(path, encoding="utf-8") as fh:
+        data = json.load(fh)
+except (OSError, json.JSONDecodeError) as exc:
+    raise SystemExit(f"kan {path} niet lezen: {exc}")
+
+theme = data.get("theme")
+if not isinstance(theme, dict):
+    theme = {}
+if theme.get("name") != "wal":
+    theme["name"] = "wal"
+    theme.setdefault("mode", "dark")
+    data["theme"] = theme
+    tmp = f"{path}.tmp-{os.getpid()}"
+    try:
+        with open(tmp, "w", encoding="utf-8") as fh:
+            json.dump(data, fh, indent=2, ensure_ascii=False)
+            fh.write("\n")
+        os.replace(tmp, path)
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+PY
+    then
+        echo "!! OpenCode-thema instellen is mislukt; cli.json is ongewijzigd." >&2
+    fi
 fi
 
 # systemd-user-timer voor de automatische wallpaperwissel.
