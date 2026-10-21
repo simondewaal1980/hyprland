@@ -28,6 +28,9 @@ De qtile-opzet die al op deze machine staat blijft gewoon werken.
 * **Hulpmiddelen** — wlogout power-menu, klembordgeschiedenis (cliphist),
   schermafdrukken (grim/slurp/swappy), kleurenpicker (hyprpicker),
   blueman en nm-applet in het systeemvak.
+* **Koptelefoon automatisch verbinden** — de soundcore Space One Pro wordt bij
+  het inloggen verbonden door `connect-soundcore.sh`. Het script wacht tot de
+  Bluetooth-adapter klaar is en probeert het daarna een minuut lang.
 * **Bestandskoppelingen** — Dolphin opent tekst en code in Kate, pdf's in
   Okular, afbeeldingen in Gwenview, video in Haruna, muziek in Elisa,
   archieven in Ark en kantoordocumenten in LibreOffice.
